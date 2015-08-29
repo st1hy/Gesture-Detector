@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="gesture_detector_translation_start_threshold_distance">10dp</dimen>
+    <dimen name="gesture_detector_scale_start_threshold_distance">10dp</dimen>
+    <dimen name="gesture_detector_fling_threshold_velocity">100mm</dimen>
+</resources>
