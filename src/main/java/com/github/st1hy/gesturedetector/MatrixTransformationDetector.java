@@ -16,8 +16,6 @@ import static android.view.MotionEvent.ACTION_UP;
  * Calculates transformation matrix based on user touch input.
  * <p/>
  * Internally it uses {@link Matrix#setPolyToPoly(float[], int, float[], int, int)} with start points matching pointers when event started and ending points of the current pointers from {@link MotionEvent}.
- * <p/>
- * This implementation
  */
 public class MatrixTransformationDetector implements GestureDetector {
     protected final boolean enabled;
@@ -68,12 +66,15 @@ public class MatrixTransformationDetector implements GestureDetector {
      * @param listener Listener to be called when events happen.
      * @param options  Options for controlling behavior of this detector.
      * @throws NullPointerException if listener of options are null.
+     * @throws IllegalArgumentException if {@link Options.Constant#MATRIX_MAX_POINTERS_COUNT} has greater value than 4
      */
     public MatrixTransformationDetector(Listener listener, Options options) {
         if (listener == null) throw new NullPointerException("Listener cannot be null");
         if (options == null) throw new NullPointerException("Options cannot be null");
         this.listener = listener;
         this.maxPointersCount = options.get(Options.Constant.MATRIX_MAX_POINTERS_COUNT);
+        if (maxPointersCount > 4)
+            throw new IllegalArgumentException("Maximum pointers count cannot exceed 4");
         this.enabled = options.isEnabled(Options.Event.MATRIX_TRANSFORMATION);
     }
 
