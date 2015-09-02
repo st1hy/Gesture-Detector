@@ -18,7 +18,7 @@ import static android.view.MotionEvent.ACTION_UP;
  * Internally it uses {@link Matrix#setPolyToPoly(float[], int, float[], int, int)} with start points matching pointers when event started and ending points of the current pointers from {@link MotionEvent}.
  */
 public class MatrixTransformationDetector implements GestureDetector {
-    protected final boolean enabled;
+    protected final boolean enabled, openGLCompatibility;
     protected final int maxPointersCount;
     protected final Listener listener;
     protected boolean isEventValid = false;
@@ -29,6 +29,7 @@ public class MatrixTransformationDetector implements GestureDetector {
     protected final SparseArray<PointF> startPoints = new SparseArray<>();
     protected final Matrix matrix = new Matrix();
     protected final float[] poly = new float[16];
+    protected int height;
 
     /**
      * Created transformation matrix detector with default values.
@@ -41,6 +42,7 @@ public class MatrixTransformationDetector implements GestureDetector {
         this.listener = listener;
         this.maxPointersCount = 4;
         this.enabled = true;
+        this.openGLCompatibility = false;
     }
 
     /**
@@ -58,6 +60,7 @@ public class MatrixTransformationDetector implements GestureDetector {
         this.listener = listener;
         this.maxPointersCount = maxPointersCount;
         this.enabled = true;
+        this.openGLCompatibility = false;
     }
 
     /**
@@ -76,6 +79,7 @@ public class MatrixTransformationDetector implements GestureDetector {
         if (maxPointersCount > 4)
             throw new IllegalArgumentException("Maximum pointers count cannot exceed 4");
         this.enabled = options.isEnabled(Options.Event.MATRIX_TRANSFORMATION);
+        this.openGLCompatibility = options.getFlag(Options.Flag.MATRIX_OPEN_GL_COMPATIBILITY);
     }
 
     @Override
@@ -99,6 +103,7 @@ public class MatrixTransformationDetector implements GestureDetector {
     @Override
     public boolean onTouch(View v, MotionEvent event) {
         if (!enabled) return false;
+        height = v.getHeight();
         switch (event.getActionMasked()) {
             case ACTION_DOWN:
                 return onActionDown(event);
@@ -162,9 +167,9 @@ public class MatrixTransformationDetector implements GestureDetector {
             int xIndex = i * 2;
             int yIndex = xIndex + 1;
             poly[xIndex] = src.x;
-            poly[yIndex] = src.y;
+            poly[yIndex] = openGLCompatibility ? height - src.y : src.y;
             poly[xIndex + polySize] = event.getX(i);
-            poly[yIndex + polySize] = event.getY(i);
+            poly[yIndex + polySize] = openGLCompatibility ? height - event.getY(i) : event.getY(i);
         }
         matrix.setPolyToPoly(poly, 0, poly, polySize, pointsCount);
     }

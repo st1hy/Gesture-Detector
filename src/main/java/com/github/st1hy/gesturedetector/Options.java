@@ -14,12 +14,13 @@ import static com.github.st1hy.gesturedetector.Options.Constant.MATRIX_MAX_POINT
 import static com.github.st1hy.gesturedetector.Options.Constant.ROTATION_START_THRESHOLD;
 import static com.github.st1hy.gesturedetector.Options.Constant.SCALE_START_THRESHOLD;
 import static com.github.st1hy.gesturedetector.Options.Constant.TRANSLATION_START_THRESHOLD;
+import static com.github.st1hy.gesturedetector.Options.Flag.MATRIX_OPEN_GL_COMPATIBILITY;
 import static com.github.st1hy.gesturedetector.Options.Flag.TRANSLATION_STRICT_ONE_FINGER;
 
 /**
  * Gesture detection options.
  * <p/>
- * By default all {@link Options.Event events} are enabled (with exception of {@link Event#DOUBLE_CLICK}) and all {@link Flag flags} except {@link Flag#TRANSLATION_STRICT_ONE_FINGER} are set.
+ * By default all {@link Options.Event events} are enabled (with exception of {@link Event#DOUBLE_CLICK}) and all {@link Flag flags} except {@link Flag#TRANSLATION_STRICT_ONE_FINGER} and {@link Flag#MATRIX_OPEN_GL_COMPATIBILITY} are set.
  */
 public class Options implements Cloneable {
     private EnumSet<Event> enabledEvents = EnumSet.noneOf(Event.class);
@@ -42,7 +43,12 @@ public class Options implements Cloneable {
         /**
          * Return rotation in degrees instead of radians
          */
-        ROTATION_DEGREES
+        ROTATION_DEGREES,
+        /**
+         * When computing coordinates of events assume y-axis is oriented in opposite direction than whats received.
+         * It computes new y position be subtracting current y value from view height.
+         */
+        MATRIX_OPEN_GL_COMPATIBILITY
     }
 
     public enum Constant {
@@ -105,6 +111,7 @@ public class Options implements Cloneable {
         enabledEvents.remove(Event.DOUBLE_CLICK);
         flags.addAll(EnumSet.allOf(Flag.class));
         flags.remove(TRANSLATION_STRICT_ONE_FINGER);
+        flags.remove(MATRIX_OPEN_GL_COMPATIBILITY);
 
         for (Constant constant : Constant.values()) {
             constants.put(constant, constant.defaultValue);
