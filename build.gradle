@@ -1,29 +1,41 @@
 buildscript {
     repositories {
         jcenter()
+        mavenCentral()
     }
     dependencies {
-    	classpath 'com.android.tools.build:gradle:1.3.0'
+    	classpath 'com.android.tools.build:gradle:1.5.0'
+        classpath 'com.github.dcendents:android-maven-gradle-plugin:1.3'
     }
 }
 
 plugins {
-    id "com.jfrog.bintray" version "1.3.1"
+    id "com.jfrog.bintray" version "1.6"
 }
 
-apply plugin: 'com.android.library'
-apply plugin: 'maven'
-apply plugin: 'maven-publish'
+group = 'org.st1hy.android'
+version = '1.0.2'
+
+allprojects {
+    repositories {
+        jcenter()
+    }
+
+    apply plugin: 'com.android.library'
+    apply plugin: 'com.github.dcendents.android-maven'
+    apply plugin: 'maven'
+    apply plugin: 'maven-publish'
+}
 
 android {
     compileSdkVersion 23
-    buildToolsVersion "23.0.0"
+    buildToolsVersion "23.0.3"
 
     defaultConfig {
         minSdkVersion 8
         targetSdkVersion 23
-        versionCode 2
-        versionName "1.0.1"
+        versionCode 3
+        versionName "1.0.2"
     }
     buildTypes {
         release {
@@ -36,25 +48,55 @@ android {
 Properties props = new Properties()
 props.load(new FileInputStream(file(('.bintray'))))
 
-group = 'org.st1hy.android'
-version = '1.0.1'
+install {
+    repositories.mavenInstaller {
+        pom.project {
+            name 'Gesture Detector'
+            description 'Library for processing MotionEvents into various gestures'
+            url 'https://github.com/st1hy/Gesture-Detector'
+
+            packaging = ['jar']
+            groupId 'org.st1hy.android'
+            artifactId 'gesture-detector'
+            version '1.0.2'
+
+            licenses {
+                license {
+                    name 'The Apache Software License, Version 2.0'
+                    url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    distribution 'repo'
+                }
+            }
+            scm {
+                connection 'https://github.com/st1hy/Gesture-Detector.git'
+                url 'https://github.com/st1hy/Gesture-Detector'
+
+            }
+            developers {
+                developer {
+                    name 'st1hy'
+                }
+            }
+        }
+    }
+}
 
 bintray {
     user = props.getProperty('BINTRAY_USER')
     key = props.getProperty('BINTRAY_KEY')
+    configurations = ['archives']
+    publications = ['Maven']
     pkg {
         repo = 'maven'
         name = 'Gesture-Detector'
+        userOrg = user
         licenses = ['Apache-2.0']
         vcsUrl = 'https://github.com/st1hy/Gesture-Detector.git'
         version {
-            name = '1.0.1'
-            desc = 'Gesture Detector 1.0.1'
-            vcsTag = '1.0.1'
-            released = new Date()
+            name = '1.0.2'
+            desc = 'Gesture Detector 1.0.2'
+            vcsTag = '1.0.2'
         }
-        publications = ['MyPublication']
-        configurations = ['archives']
         dryRun = false
         publish = false
     }
@@ -77,10 +119,10 @@ task androidSourcesJar(type: Jar) {
 
 publishing {
     publications {
-        MyPublication(MavenPublication) {
+        Maven(MavenPublication) {
             groupId 'org.st1hy.android'
             artifactId 'gesture-detector'
-            version '1.0.1'
+            version '1.0.2'
 
             artifact(androidSourcesJar) {
                 classifier "src"

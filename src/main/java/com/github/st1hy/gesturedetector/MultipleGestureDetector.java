@@ -11,7 +11,7 @@ import java.util.List;
 
 /**
  * Listens for gesture events.
- * <p/>
+ *
  * Events are delivered through {@link MultipleGestureListener}. {@link Options} control which events will be triggered and various thresholds and settings.
  */
 public class MultipleGestureDetector implements MultipleGestureListener, GestureDetector {

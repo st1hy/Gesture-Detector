@@ -8,18 +8,22 @@ import static android.view.MotionEvent.ACTION_DOWN;
 import static android.view.MotionEvent.ACTION_POINTER_DOWN;
 import static android.view.MotionEvent.ACTION_POINTER_UP;
 import static android.view.MotionEvent.ACTION_UP;
+import static com.github.st1hy.gesturedetector.FlingDetector.Direction.DOWN;
+import static com.github.st1hy.gesturedetector.FlingDetector.Direction.LEFT;
+import static com.github.st1hy.gesturedetector.FlingDetector.Direction.RIGHT;
+import static com.github.st1hy.gesturedetector.FlingDetector.Direction.UP;
 
 
 /**
  * Detects fling events.
- * <p/>
+ *
  * Calls {@link Listener#onFling(PointF, float, Direction)} when appropriate.
- * <p/>
+ *
  * {@link Options.Event#FLING} enables or disables this detector.
  */
 public class FlingDetector implements GestureDetector {
     protected static final float MS_IN_SEC = 1e3f;
-    protected final boolean enabled;
+    protected final boolean enabled, openGLCompat;
     protected final float flingThresholdPercent, flingVelocityThreshold;
     protected final Listener listener;
     protected float lastX, lastY;
@@ -41,6 +45,7 @@ public class FlingDetector implements GestureDetector {
         this.enabled = options.isEnabled(Options.Event.FLING);
         this.flingThresholdPercent = options.get(Options.Constant.FLING_TRANSLATION_THRESHOLD) / 100f;
         this.flingVelocityThreshold = options.get(Options.Constant.FLING_VELOCITY_THRESHOLD);
+        this.openGLCompat = options.getFlag(Options.Flag.MATRIX_OPEN_GL_COMPATIBILITY);
     }
 
     public interface Listener {
@@ -106,12 +111,12 @@ public class FlingDetector implements GestureDetector {
         float absVy = Math.abs(vy);
         if (absVx > absVy) {
             if (absVx > flingVelocityThreshold) {
-                notifyListener(absVx, vx > 0 ? Direction.RIGHT : Direction.LEFT);
+                notifyListener(absVx, vx > 0 ? RIGHT : LEFT);
                 return true;
             }
         } else {
             if (absVy > flingVelocityThreshold) {
-                notifyListener(absVy, vy > 0 ? Direction.DOWN : Direction.UP);
+                notifyListener(absVy, vy > 0 ? down() : up());
                 return true;
             }
         }
@@ -119,14 +124,22 @@ public class FlingDetector implements GestureDetector {
         float absDy = Math.abs(dy);
         if (absDx > absDy) {
             if (absDx > xThreshold) {
-                notifyListener(absVx, dx > 0 ? Direction.RIGHT : Direction.LEFT);
+                notifyListener(absVx, dx > 0 ? RIGHT : LEFT);
             }
         } else {
             if (absDy > yThreshold) {
-                notifyListener(absVy, dy > 0 ? Direction.DOWN : Direction.UP);
+                notifyListener(absVy, dy > 0 ? down() : up());
             }
         }
         return true;
+    }
+
+    private Direction up() {
+        return openGLCompat ? DOWN : UP;
+    }
+
+    private Direction down() {
+        return openGLCompat ? UP : DOWN;
     }
 
     protected boolean onActionPointerDown(MotionEvent event) {

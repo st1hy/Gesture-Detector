@@ -13,13 +13,13 @@ import static com.github.st1hy.gesturedetector.Options.Constant.SCALE_START_THRE
 
 /**
  * Detects scaling events.
- * <p/>
+ *
  * Calls {@link Listener#onScale(GestureEventState, PointF, float, float)} when appropriate.
- * <p/>
+ *
  * {@link Options.Event#SCALE} enables or disables this detector.
  */
 public class ScaleDetector implements GestureDetector {
-    protected final boolean enabled;
+    protected final boolean enabled, openGLCompat;
     protected final int scaleThreshold;
     protected final Listener listener;
     protected final PointF centerPoint = new PointF();
@@ -29,6 +29,7 @@ public class ScaleDetector implements GestureDetector {
     protected boolean isEventValid = false;
     protected boolean inProgress = false;
     protected GestureEventState currentState = GestureEventState.ENDED;
+    protected int height;
 
     /**
      * Constructs new {@link ScaleDetector}.
@@ -41,6 +42,7 @@ public class ScaleDetector implements GestureDetector {
         this.listener = listener;
         this.enabled = options.isEnabled(Options.Event.SCALE);
         this.scaleThreshold = options.get(SCALE_START_THRESHOLD);
+        this.openGLCompat = options.getFlag(Options.Flag.MATRIX_OPEN_GL_COMPATIBILITY);
     }
 
     public interface Listener {
@@ -69,6 +71,7 @@ public class ScaleDetector implements GestureDetector {
         if (!enabled) return false;
         switch (event.getActionMasked()) {
             case ACTION_DOWN:
+                height = v.getHeight();
                 return onActionDown(event);
             case ACTION_UP:
                 return onActionUp(event);
@@ -133,7 +136,7 @@ public class ScaleDetector implements GestureDetector {
         int pointsCount = event.getPointerCount();
         for (int i = 0; i < pointsCount; i++) {
             centerX += event.getX(i);
-            centerY += event.getY(i);
+            centerY += getValueOfY(event, i);
         }
         centerX /= pointsCount;
         centerY /= pointsCount;
@@ -141,7 +144,7 @@ public class ScaleDetector implements GestureDetector {
         double distance = 0;
         for (int i = 0; i < pointsCount; i++) {
             float dx = event.getX(i) - centerX;
-            float dy = event.getY(i) - centerY;
+            float dy = getValueOfY(event, i) - centerY;
             distance += distance(dx, dy);
         }
         currentDistance = distance / pointsCount;
@@ -161,7 +164,7 @@ public class ScaleDetector implements GestureDetector {
         for (int i = 0; i < pointsCount; i++) {
             if (discardPointerIndex == i) continue;
             centerX += event.getX(i);
-            centerY += event.getY(i);
+            centerY += getValueOfY(event, i);
         }
         if (discardPointerIndex != -1) pointsCount -= 1;
         centerX /= pointsCount;
@@ -173,7 +176,7 @@ public class ScaleDetector implements GestureDetector {
         for (int i = 0; i < pointsCount; i++) {
             if (discardPointerIndex == i) continue;
             float dx = event.getX(i) - centerX;
-            float dy = event.getY(i) - centerY;
+            float dy = getValueOfY(event, i) - centerY;
             distance += distance(dx, dy);
         }
         if (discardPointerIndex != -1) pointsCount -= 1;
@@ -190,5 +193,10 @@ public class ScaleDetector implements GestureDetector {
         if (currentState != GestureEventState.ENDED) notifyListener(GestureEventState.ENDED);
         calculateCenter(event, event.getActionIndex());
         return true;
+    }
+
+    private float getValueOfY(MotionEvent event, int pointerIndex) {
+        float y = event.getY(pointerIndex);
+        return openGLCompat ? height - y : y;
     }
 }

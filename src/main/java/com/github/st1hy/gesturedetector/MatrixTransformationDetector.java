@@ -14,7 +14,7 @@ import static android.view.MotionEvent.ACTION_UP;
 
 /**
  * Calculates transformation matrix based on user touch input.
- * <p/>
+ *
  * Internally it uses {@link Matrix#setPolyToPoly(float[], int, float[], int, int)} with start points matching pointers when event started and ending points of the current pointers from {@link MotionEvent}.
  */
 public class MatrixTransformationDetector implements GestureDetector {

@@ -19,7 +19,7 @@ import static com.github.st1hy.gesturedetector.Options.Flag.TRANSLATION_STRICT_O
 
 /**
  * Gesture detection options.
- * <p/>
+ *
  * By default all {@link Options.Event events} are enabled (with exception of {@link Event#DOUBLE_CLICK}) and all {@link Flag flags} except {@link Flag#TRANSLATION_STRICT_ONE_FINGER} and {@link Flag#MATRIX_OPEN_GL_COMPATIBILITY} are set.
  */
 public class Options implements Cloneable {
@@ -81,7 +81,7 @@ public class Options implements Cloneable {
         FLING_VELOCITY_THRESHOLD(1000),
         /**
          * How much pointer have to move to consider this a fling.
-         * <p/>
+         *
          * i.e value 50 means that pointer needs to move 50 % of the related view width or height depending on the fling.
          * Hardcoded default: 50 %
          */
@@ -128,7 +128,7 @@ public class Options implements Cloneable {
 
     /**
      * Creates empty options.
-     * <p/>
+     *
      * None of the {@link Event events} or {@link Flag flags} are set. Constants will return 0.
      */
     public Options() {

@@ -10,17 +10,18 @@ import static android.view.MotionEvent.ACTION_POINTER_DOWN;
 import static android.view.MotionEvent.ACTION_POINTER_UP;
 import static android.view.MotionEvent.ACTION_UP;
 import static com.github.st1hy.gesturedetector.Options.Constant.TRANSLATION_START_THRESHOLD;
+import static com.github.st1hy.gesturedetector.Options.Flag.MATRIX_OPEN_GL_COMPATIBILITY;
 import static com.github.st1hy.gesturedetector.Options.Flag.TRANSLATION_STRICT_ONE_FINGER;
 
 /**
  * Detects translation events.
- * <p/>
+ *
  * Calls {@link Listener#onTranslate(GestureEventState, PointF, float, float, float, float, double)} when appropriate.
- * <p/>
+ *
  * {@link Options.Event#TRANSLATE} enables or disables this detector.
  */
 public class TranslationDetector implements GestureDetector {
-    protected final boolean enabled, strictOneFinger;
+    protected final boolean enabled, strictOneFinger, openGLCompat;
     protected final int translationThreshold;
     protected final Listener listener;
     protected final PointF centerPoint = new PointF();
@@ -30,6 +31,7 @@ public class TranslationDetector implements GestureDetector {
     protected boolean isEventValid = false;
     protected boolean inProgress = false;
     protected GestureEventState currentState = GestureEventState.ENDED;
+    protected int height;
 
     /**
      * Constructs new {@link TranslationDetector}.
@@ -45,6 +47,7 @@ public class TranslationDetector implements GestureDetector {
         this.enabled = options.isEnabled(Options.Event.TRANSLATE);
         this.strictOneFinger = options.getFlag(TRANSLATION_STRICT_ONE_FINGER);
         this.translationThreshold = options.get(TRANSLATION_START_THRESHOLD);
+        this.openGLCompat = options.getFlag(MATRIX_OPEN_GL_COMPATIBILITY);
     }
 
     public interface Listener {
@@ -82,6 +85,7 @@ public class TranslationDetector implements GestureDetector {
         if (!enabled) return false;
         switch (event.getActionMasked()) {
             case ACTION_DOWN:
+                height = v.getHeight();
                 return onActionDown(event);
             case ACTION_UP:
                 return onActionUp(event);
@@ -144,7 +148,7 @@ public class TranslationDetector implements GestureDetector {
         int pointsCount = event.getPointerCount();
         for (int i = 0; i < pointsCount; i++) {
             centerX += event.getX(i);
-            centerY += event.getY(i);
+            centerY += getValueOfY(event, i);
         }
         centerX /= pointsCount;
         centerY /= pointsCount;
@@ -169,7 +173,7 @@ public class TranslationDetector implements GestureDetector {
         for (int i = 0; i < pointsCount; i++) {
             if (i == discardPointerIndex) continue;
             centerX += event.getX(i);
-            centerY += event.getY(i);
+            centerY += getValueOfY(event, i);
         }
         if (discardPointerIndex != -1) pointsCount -= 1;
         centerX /= pointsCount;
@@ -188,5 +192,10 @@ public class TranslationDetector implements GestureDetector {
         if (currentState != GestureEventState.ENDED) notifyListener(GestureEventState.ENDED);
         calculateCenter(event, event.getActionIndex());
         return true;
+    }
+
+    private float getValueOfY(MotionEvent event, int pointerIndex) {
+        float y = event.getY(pointerIndex);
+        return openGLCompat ? height - y : y;
     }
 }
