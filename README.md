@@ -12,5 +12,5 @@ Add repository:
 Add dependecy to your module:
 
 
-    compile 'org.st1hy.android:gesture-detector:1.0.1@aar'
+    compile 'org.st1hy.android:gesture-detector:1.0.2@aar'
     
