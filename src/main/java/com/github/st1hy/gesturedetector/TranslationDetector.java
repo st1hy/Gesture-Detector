@@ -137,9 +137,7 @@ public class TranslationDetector implements GestureDetector {
 
     protected void notifyListener(GestureEventState state) {
         currentState = state;
-        PointF point = new PointF();
-        point.set(centerPoint);
-        listener.onTranslate(state, point, x, y, dx, dy, currentDistance);
+        listener.onTranslate(state, centerPoint, x, y, dx, dy, currentDistance);
     }
 
     protected void calculatePosition(MotionEvent event) {
@@ -155,7 +153,7 @@ public class TranslationDetector implements GestureDetector {
 
         float x = centerX - centerPoint.x;
         float y = centerY - centerPoint.y;
-        currentDistance = distance(x, y);
+        currentDistance = GeometryUtils.hypotenuse(x, y);
         dx = x - this.x;
         dy = y - this.y;
         this.x = x;
@@ -181,10 +179,6 @@ public class TranslationDetector implements GestureDetector {
         x = 0;
         y = 0;
         centerPoint.set(centerX, centerY);
-    }
-
-    protected static double distance(float a, float b) {
-        return Math.sqrt(a * a + b * b);
     }
 
     protected boolean onActionPointerUp(MotionEvent event) {

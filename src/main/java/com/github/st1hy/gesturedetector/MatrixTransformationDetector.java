@@ -29,6 +29,7 @@ public class MatrixTransformationDetector implements GestureDetector {
     protected final SparseArray<PointF> startPoints = new SparseArray<>();
     protected final Matrix matrix = new Matrix();
     protected final float[] poly = new float[16];
+    protected final int translationThreshold;
     protected int height;
 
     /**
@@ -43,6 +44,7 @@ public class MatrixTransformationDetector implements GestureDetector {
         this.maxPointersCount = 4;
         this.enabled = true;
         this.openGLCompatibility = false;
+        this.translationThreshold = 0;
     }
 
     /**
@@ -61,6 +63,7 @@ public class MatrixTransformationDetector implements GestureDetector {
         this.maxPointersCount = maxPointersCount;
         this.enabled = true;
         this.openGLCompatibility = false;
+        this.translationThreshold = 0;
     }
 
     /**
@@ -80,6 +83,7 @@ public class MatrixTransformationDetector implements GestureDetector {
             throw new IllegalArgumentException("Maximum pointers count cannot exceed 4");
         this.enabled = options.isEnabled(Options.Event.MATRIX_TRANSFORMATION);
         this.openGLCompatibility = options.getFlag(Options.Flag.MATRIX_OPEN_GL_COMPATIBILITY);
+        this.translationThreshold = options.get(Options.Constant.TRANSLATION_START_THRESHOLD);
     }
 
     @Override

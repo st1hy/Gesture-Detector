@@ -134,9 +134,7 @@ public class RotationDetector implements GestureDetector {
 
     protected void notifyListener(GestureEventState state, double rotation, double deltaRotation) {
         currentState = state;
-        PointF point = new PointF();
-        point.set(centerPoint);
-        listener.onRotate(currentState, point, rotation, deltaRotation);
+        listener.onRotate(currentState, centerPoint, rotation, deltaRotation);
     }
 
     protected void calculateRotation(MotionEvent event) {

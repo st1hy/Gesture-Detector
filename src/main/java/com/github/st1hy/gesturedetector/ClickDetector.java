@@ -34,15 +34,15 @@ import static com.github.st1hy.gesturedetector.Options.Flag.MATRIX_OPEN_GL_COMPA
  *
  * This implementation must receive events on {@link TranslationDetector.Listener#onTranslate(GestureEventState, PointF, float, float,float, float, double)} if both {@link Options.Event#TRANSLATE} and {@link Flag#IGNORE_CLICK_EVENT_ON_GESTURES} are enabled.
  */
-public class ClickDetector implements TranslationDetector.Listener, GestureDetector {
+public class ClickDetector implements GestureDetector {
     protected final int longPressTime;
     protected final int doubleClickTime;
     protected final boolean clickEnabled, doubleClickEnabled, longPressEnabled, ignoreClickOnGestures, openGLCompat;
     protected final Listener listener;
     protected final Options options;
+    protected final PointF startPoint = new PointF();
     protected long pressedTimestamp, previousClickTimestamp;
     protected int eventStartPointerId;
-    protected PointF startPoint;
     protected boolean isEventValid = false;
     protected int clickCount = 0;
     protected final Handler handler;
@@ -157,7 +157,7 @@ public class ClickDetector implements TranslationDetector.Listener, GestureDetec
         pressedTimestamp = event.getEventTime();
         int pointerIndex = event.getActionIndex();
         eventStartPointerId = event.getPointerId(pointerIndex);
-        startPoint = new PointF(event.getX(pointerIndex), getValueOfY(event, pointerIndex));
+        startPoint.set(event.getX(pointerIndex), getValueOfY(event, pointerIndex));
         isEventValid = true;
         if (doubleClickEnabled) clickCount++;
         if (longPressEnabled) {
@@ -209,12 +209,8 @@ public class ClickDetector implements TranslationDetector.Listener, GestureDetec
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void onTranslate(GestureEventState state, PointF startPoint, float x, float y, float dx, float dy, double distance) {
-        if (isEventValid && GestureEventState.STARTED.equals(state) && ignoreClickOnGestures) {
+    public void onExternalGesture() {
+        if (isEventValid && ignoreClickOnGestures) {
             invalidate();
         }
     }
@@ -230,7 +226,7 @@ public class ClickDetector implements TranslationDetector.Listener, GestureDetec
             float x = event.getX(pointerIndex);
             float y = getValueOfY(event, pointerIndex);
             //We detect movement above threshold - its no longer a click but a translation.
-            if (getDistance(startPoint, x, y) > options.get(TRANSLATION_START_THRESHOLD)) {
+            if (GeometryUtils.distance(startPoint, x, y) > options.get(TRANSLATION_START_THRESHOLD)) {
                 invalidate();
             }
             return true;
@@ -245,12 +241,6 @@ public class ClickDetector implements TranslationDetector.Listener, GestureDetec
             return true;
         }
         return false;
-    }
-
-    protected static double getDistance(PointF startPoint, float endX, float endY) {
-        double a = endX - startPoint.x;
-        double b = endY - startPoint.y;
-        return Math.sqrt(a * a + b * b);
     }
 
     protected boolean isListeningForSomething() {

@@ -120,9 +120,7 @@ public class ScaleDetector implements GestureDetector {
 
     protected void notifyListener(GestureEventState state) {
         currentState = state;
-        PointF point = new PointF();
-        point.set(centerPoint);
-        listener.onScale(currentState, point, scale, scaleRelative);
+        listener.onScale(currentState, centerPoint, scale, scaleRelative);
     }
 
     protected void calculatePosition(MotionEvent event) {
@@ -143,9 +141,9 @@ public class ScaleDetector implements GestureDetector {
 
         double distance = 0;
         for (int i = 0; i < pointsCount; i++) {
-            float dx = event.getX(i) - centerX;
-            float dy = getValueOfY(event, i) - centerY;
-            distance += distance(dx, dy);
+            float x = event.getX(i);
+            float y = getValueOfY(event, i);
+            distance += GeometryUtils.distance(x, y, centerX, centerY);
         }
         currentDistance = distance / pointsCount;
         float scale = (float) (currentDistance / distanceStart);
@@ -175,17 +173,13 @@ public class ScaleDetector implements GestureDetector {
         pointsCount = event.getPointerCount();
         for (int i = 0; i < pointsCount; i++) {
             if (discardPointerIndex == i) continue;
-            float dx = event.getX(i) - centerX;
-            float dy = getValueOfY(event, i) - centerY;
-            distance += distance(dx, dy);
+            float x = event.getX(i);
+            float y = getValueOfY(event, i);
+            distance += GeometryUtils.distance(x, y, centerX, centerY);
         }
         if (discardPointerIndex != -1) pointsCount -= 1;
         scale = 1f;
         distanceStart = distance / pointsCount;
-    }
-
-    protected static double distance(float a, float b) {
-        return Math.sqrt(a * a + b * b);
     }
 
     protected boolean onActionPointerUp(MotionEvent event) {

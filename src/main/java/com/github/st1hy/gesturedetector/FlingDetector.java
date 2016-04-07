@@ -26,10 +26,10 @@ public class FlingDetector implements GestureDetector {
     protected final boolean enabled, openGLCompat;
     protected final float flingThresholdPercent, flingVelocityThreshold;
     protected final Listener listener;
+    protected final PointF startPoint = new PointF();
     protected float lastX, lastY;
     protected boolean isValid = false;
     protected float xThreshold = Float.NaN, yThreshold = Float.NaN;
-    protected PointF startPoint;
 
     /**
      * Constructs new {@link FlingDetector}.
@@ -92,7 +92,7 @@ public class FlingDetector implements GestureDetector {
         isValid = true;
         lastX = event.getX();
         lastY = event.getY();
-        startPoint = new PointF(lastX, lastY);
+        startPoint.set(lastX, lastY);
         xThreshold = flingThresholdPercent * v.getWidth();
         yThreshold = flingThresholdPercent * v.getHeight();
         return true;

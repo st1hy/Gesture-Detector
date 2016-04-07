@@ -55,9 +55,6 @@ public class MultipleGestureDetector implements MultipleGestureListener, Gesture
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
-//        if (inDebug) {
-//            Log.v(TAG, event.toString());
-//        }
         boolean isConsumed = false;
         for (GestureDetector detector : detectors) {
             isConsumed |= detector.onTouch(v, event);
@@ -70,7 +67,7 @@ public class MultipleGestureDetector implements MultipleGestureListener, Gesture
         if (inDebug) {
             Log.v(TAG, String.format("Translation %s: startX = %.1f, startY = %.1f, x = %.1f, y = %.1f, dx = %.2f, dy = %.2f, distance = %.2f", state.toString(), startPoint.x, startPoint.y, x, y, dx, dy, distance));
         }
-        clickDetector.onTranslate(state, startPoint, x, y, dx, dy, distance);
+        clickDetector.onExternalGesture();
         listener.onTranslate(state, startPoint, x, y, dx, dy, distance);
     }
 
@@ -79,6 +76,7 @@ public class MultipleGestureDetector implements MultipleGestureListener, Gesture
         if (inDebug) {
             Log.v(TAG, String.format("Rotation %s: x = %.1f, y = %.1f, rotation = %.1f, delta = %.2f", state.toString(), centerPoint.x, centerPoint.y, rotation, delta));
         }
+        clickDetector.onExternalGesture();
         listener.onRotate(state, centerPoint, rotation, delta);
     }
 
@@ -87,6 +85,7 @@ public class MultipleGestureDetector implements MultipleGestureListener, Gesture
         if (inDebug) {
             Log.v(TAG, String.format("Scale %s: x = %.1f, y = %.1f, scale = %.2f, diffScale = %.3f", state.toString(), centerPoint.x, centerPoint.y, scale, scaleRelative));
         }
+        clickDetector.onExternalGesture();
         listener.onScale(state, centerPoint, scale, scaleRelative);
     }
 
@@ -119,6 +118,7 @@ public class MultipleGestureDetector implements MultipleGestureListener, Gesture
         if (inDebug) {
             Log.v(TAG, String.format("Fling %s: x = %.1f, y = %.1f, velocity = %.2f", direction.toString(), startPoint.x, startPoint.y, velocity));
         }
+        clickDetector.onExternalGesture();
         listener.onFling(startPoint, velocity, direction);
     }
 
@@ -127,6 +127,7 @@ public class MultipleGestureDetector implements MultipleGestureListener, Gesture
         if (inDebug) {
             Log.v(TAG, String.format("Matrix %s: %s", state.toString(), currentTransformation.toShortString()));
         }
+        clickDetector.onExternalGesture();
         listener.onMatrix(state, currentTransformation);
     }
 }
